@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 
 public enum QuestionType {
-    MULTI_SELECT("multiSelect"),
-    SINGLE_SELECT("singleSelect");
+    MULTI_SELECT("multi_select"),
+    SINGLE_SELECT("single_select");
 
     private final String jsonValue;
 
