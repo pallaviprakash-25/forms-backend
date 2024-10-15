@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class Section {
-    private String sectionId;
+    private String id;
 
     @NotNull
     @Size(min=5, max=256, message = "Section name must be between 5 and 256 characters long")
