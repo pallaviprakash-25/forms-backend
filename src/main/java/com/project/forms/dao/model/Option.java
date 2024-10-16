@@ -9,6 +9,6 @@ public class Option {
     private String id;
 
     @NotNull
-    @Size(min=5, max=256, message = "Option label must be between 5 and 256 characters long")
+    @Size(max=256, message = "Option label can have a maximum of 256 characters")
     private String label;
 }

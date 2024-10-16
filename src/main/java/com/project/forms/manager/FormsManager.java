@@ -5,6 +5,7 @@ import com.project.forms.dao.request.FormCreateUpdateRequest;
 import com.project.forms.dao.response.FormCreateUpdateResponse;
 import com.project.forms.dao.response.FormResponseById;
 import com.project.forms.dao.response.FormResponseByUserId;
+import com.project.forms.dao.response.PublishedFormResponseById;
 import com.project.forms.repository.FormsRepository;
 import com.project.forms.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -80,6 +81,22 @@ public class FormsManager {
     public FormResponseByUserId getFormByUserId(final String userId) {
         final List<Form> forms = formsRepository.findAllByUserId(userId);
         return FormResponseByUserId.from(forms);
+    }
+
+    /**
+     * Method to fetch published form details based on formId
+     *
+     * @param formId ID of the form
+     * @return {@link PublishedFormResponseById} instance
+     * @throws BadRequestException
+     */
+    public PublishedFormResponseById getPublishedFormById(final String formId) throws BadRequestException {
+        final Optional<Form> form = formsRepository.findById(formId);
+        if (form.isEmpty()) {
+            log.error("Form with ID {} does not exist", formId);
+            throw new BadRequestException("Form ID does not exist");
+        }
+        return PublishedFormResponseById.from(form.get());
     }
 
     /**

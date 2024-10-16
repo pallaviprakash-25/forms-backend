@@ -18,11 +18,11 @@ public class FormCreateUpdateRequest {
     private String formId;
 
     @NotNull
-    @Size(min=5, max=256, message = "Form name must be between 5 and 265 characters long")
+    @Size(max=256, message = "Form name can have a maximum of 256 characters")
     private String formName;
 
     @Valid
-    @Size(max=30, message = "There can be a maximum of 30 sections in a form")
+    @Size(max=30, message = "A form can have a maximum of 30 sections")
     private List<Section> sections;
 
     private Audit audit;

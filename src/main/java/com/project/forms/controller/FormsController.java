@@ -4,6 +4,7 @@ import com.project.forms.dao.request.FormCreateUpdateRequest;
 import com.project.forms.dao.response.FormCreateUpdateResponse;
 import com.project.forms.dao.response.FormResponseById;
 import com.project.forms.dao.response.FormResponseByUserId;
+import com.project.forms.dao.response.PublishedFormResponseById;
 import com.project.forms.manager.FormsManager;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
@@ -21,21 +22,27 @@ public class FormsController {
     @Autowired
     private FormsManager formsService;
 
-    @PostMapping
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<FormCreateUpdateResponse> createOrUpdateForm(@Valid @RequestBody final FormCreateUpdateRequest request) {
         final FormCreateUpdateResponse response = formsService.createUpdateForm(request);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(ID)
+    @GetMapping(value = ID, produces = "application/json")
     public ResponseEntity<FormResponseById> fetchFormByFormId(@PathVariable final String id) throws BadRequestException {
         final FormResponseById response = formsService.getFormByFormId(id);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(USER_ID_PATH)
+    @GetMapping(value = USER_ID_PATH, produces = "application/json")
     public ResponseEntity<FormResponseByUserId> fetchFormByUserId(@PathVariable final String id) {
         final FormResponseByUserId response = formsService.getFormByUserId(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = PUBLISHED_FORM_BY_ID_PATH, produces = "application/json")
+    public ResponseEntity<PublishedFormResponseById> fetchPublishedFormById(@PathVariable final String id) throws BadRequestException {
+        final PublishedFormResponseById response = formsService.getPublishedFormById(id);
         return ResponseEntity.ok(response);
     }
 }

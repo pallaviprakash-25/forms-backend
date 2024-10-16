@@ -13,7 +13,7 @@ public class Question {
     private String id;
 
     @NotNull
-    @Size(min=5, max=256, message = "Question label must be between 5 and 256 characters long")
+    @Size(max=256, message = "Question label can have a maximum of 256 characters")
     private String label;
 
     @NotNull
@@ -25,6 +25,7 @@ public class Question {
     private boolean required;
 
     @Valid
-    @Size(max=30, message = "There can be a maximum of 30 options for a question")
+    @NotNull
+    @Size(min=1, max=30, message = "A question must have a minimum of 1 and a maximum of 30 options")
     private List<Option> options;
 }
