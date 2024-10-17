@@ -15,10 +15,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
-public class FormResponseByUserId {
+public class FormDetailsByUserId {
     private List<FormDetails> forms;
 
-    public static FormResponseByUserId from(final List<Form> formsResponse) {
+    public static FormDetailsByUserId from(final List<Form> formsResponse) {
         final List<FormDetails> formDetailsList = formsResponse.stream().map(form -> {
             FormDetails details = new FormDetails();
             BeanUtils.copyProperties(form, details);
@@ -30,7 +30,7 @@ public class FormResponseByUserId {
             }
             return details;
         }).toList();
-        return new FormResponseByUserId(formDetailsList);
+        return new FormDetailsByUserId(formDetailsList);
     }
 
     @Data

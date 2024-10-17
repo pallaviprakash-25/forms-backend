@@ -2,6 +2,7 @@ package com.project.forms.utils;
 
 public interface Constants {
     String FORM = "form";
+    String RESPONSE = "response";
     String FORM_ID = "formId";
     String FORM_NAME = "formName";
 
