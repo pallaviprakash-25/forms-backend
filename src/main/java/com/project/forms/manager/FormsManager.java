@@ -35,7 +35,7 @@ public class FormsManager {
      * @param request {@link FormCreateUpdateRequest} instance
      * @return {@link FormCreateUpdateResponse} instance
      */
-    public FormCreateUpdateResponse createUpdateForm(final FormCreateUpdateRequest request) {
+    public FormCreateUpdateResponse createUpdateForm(final FormCreateUpdateRequest request) throws BadRequestException {
         final Date currentDate = Date.from(Instant.now());
         if (StringUtils.isAllEmpty(request.getFormId())) {
             // create request
@@ -46,6 +46,11 @@ public class FormsManager {
 
         } else {
             // update request
+            final Optional<Form> form = formsRepository.findById(request.getFormId());
+            if (form.isEmpty()) {
+                log.error("Form with ID {} does not exist", request.getFormId());
+                throw new BadRequestException("Form ID does not exist");
+            }
             request.getAudit().setModifiedOn(currentDate);
         }
         setIds(request);

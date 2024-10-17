@@ -23,7 +23,7 @@ public class FormsController {
     private FormsManager formsService;
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<FormCreateUpdateResponse> createOrUpdateForm(@Valid @RequestBody final FormCreateUpdateRequest request) {
+    public ResponseEntity<FormCreateUpdateResponse> createOrUpdateForm(@Valid @RequestBody final FormCreateUpdateRequest request) throws BadRequestException {
         final FormCreateUpdateResponse response = formsService.createUpdateForm(request);
         return ResponseEntity.ok(response);
     }
