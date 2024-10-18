@@ -2,6 +2,7 @@ package com.project.forms.manager;
 
 import com.project.forms.dao.model.*;
 import com.project.forms.dao.request.FormResponseSaveRequest;
+import com.project.forms.dao.response.ResponsesByFormId;
 import com.project.forms.repository.FormsRepository;
 import com.project.forms.repository.ResponsesRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,23 @@ public class ResponsesManager {
         response.setSubmittedOn(currentDate);
 
         responsesRepository.save(response);
+    }
+
+    /**
+     * Method to fetch all responses for a form
+     *
+     * @param formId ID of the form
+     * @return {@link ResponsesByFormId} instance containing list of responses
+     * @throws BadRequestException
+     */
+    public ResponsesByFormId getAllResponses(final String formId) throws BadRequestException {
+        final Optional<Form> form = formsRepository.findById(formId);
+        if (form.isEmpty()) {
+            log.error("Form with ID {} does not exist", formId);
+            throw new BadRequestException("Form ID does not exist");
+        }
+        final List<Response> responses = responsesRepository.findAllByFormId(formId);
+        return new ResponsesByFormId(responses);
     }
 
     /**
