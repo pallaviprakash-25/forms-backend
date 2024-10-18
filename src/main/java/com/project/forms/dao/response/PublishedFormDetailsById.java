@@ -13,12 +13,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublishedFormDetailsById {
-    private String formId;
     private List<PublishedSection> sections;
 
     public static PublishedFormDetailsById from(final Form form) {
         final PublishedFormDetailsById publishedFormDetails = new PublishedFormDetailsById();
-        publishedFormDetails.setFormId(form.getFormId());
         if (!CollectionUtils.isEmpty(form.getSections())) {
             final List<PublishedSection> publishedSections = form.getSections().stream()
                     .map(PublishedSection::from)

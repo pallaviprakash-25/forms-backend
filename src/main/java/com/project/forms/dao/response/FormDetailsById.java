@@ -13,7 +13,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FormDetailsById {
-    private String formId;
     private String formName;
     private List<Section> sections;
 

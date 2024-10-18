@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -41,7 +38,7 @@ public class ResponsesManager {
             throw new BadRequestException("Form ID does not exist");
         }
 
-        validateIds(form.get(), request);
+        validateSectionIds(form.get(), request);
 
         final Response response = new Response();
         BeanUtils.copyProperties(request, response);
@@ -73,96 +70,110 @@ public class ResponsesManager {
     }
 
     /**
-     * Helper method to validate if section, question and option IDs in the request exist in the form
-     *
-     * @param form    existing form
-     * @param request form response to be saved
-     * @throws BadRequestException
-     */
-    private void validateIds(final Form form, final FormResponseSaveRequest request) throws BadRequestException{
-        if (!CollectionUtils.isEmpty(request.getSections())) {
-            validateSectionIds(form, request);
-        }
-    }
-
-    /**
      * Helper method to validate section IDs
      *
-     * @param form    existing form
-     * @param request form response to be saved
+     * @param form         form details
+     * @param formResponse form response to be saved
      * @throws BadRequestException
      */
-    private static void validateSectionIds(final Form form, FormResponseSaveRequest request) throws BadRequestException {
-        final List<String> existingSectionIds = form.getSections().stream()
-                .map(Section::getId)
-                .toList();
-        for (ResponseSection responseSection : request.getSections()) {
-            if (!existingSectionIds.contains(responseSection.getId())) {
-                final String errorMsg = String.format("Section ID %s does not exist in form %s",
-                        responseSection.getId(), form.getFormId());
-                log.error(errorMsg);
-                throw new BadRequestException(errorMsg);
-            }
-            final Section existingSection = form.getSections().stream()
-                    .filter(sec -> sec.getId().equals(responseSection.getId()))
-                    .findFirst()
-                    .orElse(null);
-            if (!CollectionUtils.isEmpty(responseSection.getQuestions())) {
-                validateQuestionIds(form.getFormId(), existingSection, responseSection);
+    private void validateSectionIds(final Form form, final FormResponseSaveRequest formResponse) throws BadRequestException {
+        if (!CollectionUtils.isEmpty(formResponse.getSections())) {
+            final List<String> existingSectionIds = form.getSections().stream()
+                    .map(Section::getId)
+                    .toList();
+            for (ResponseSection responseSection : formResponse.getSections()) {
+                if (!existingSectionIds.contains(responseSection.getId())) {
+                    final String errorMsg = String.format("Section ID %s does not exist", responseSection.getId());
+                    log.error(errorMsg);
+                    throw new BadRequestException(errorMsg);
+                }
+
+                final Section existingSection = form.getSections().stream()
+                        .filter(sec -> sec.getId().equals(responseSection.getId()))
+                        .findFirst()
+                        .orElse(null);
+                validateQuestionIds(existingSection, responseSection);
             }
         }
+        checkRequiredQuestions(form, formResponse);
     }
 
     /**
      * Helper method to validate question IDs in a section
      *
-     * @param formId          ID of the form
      * @param existingSection existing section in the form
      * @param responseSection section in the form response
      * @throws BadRequestException
      */
-    private static void validateQuestionIds(final String formId, final Section existingSection,
-                                            final ResponseSection responseSection) throws BadRequestException {
-        final List<String> existingQuestionIds = existingSection.getQuestions().stream()
-                .map(Question::getId)
-                .toList();
-        for (ResponseQuestion responseQuestion: responseSection.getQuestions()) {
-            if (!existingQuestionIds.contains(responseQuestion.getId())) {
-                final String errorMsg = String.format("Question ID %s does not exist in section %s within form %s",
-                        responseQuestion.getId(), existingSection.getId(), formId);
-                log.error(errorMsg);
-                throw new BadRequestException(errorMsg);
+    private void validateQuestionIds(final Section existingSection,
+                                     final ResponseSection responseSection) throws BadRequestException {
+        if (!CollectionUtils.isEmpty(responseSection.getQuestions())) {
+            final List<String> existingQuestionIds = existingSection.getQuestions().stream()
+                    .map(Question::getId)
+                    .toList();
+            for (ResponseQuestion responseQuestion : responseSection.getQuestions()) {
+                if (!existingQuestionIds.contains(responseQuestion.getId())) {
+                    final String errorMsg = String.format("Question ID %s does not exist", responseQuestion.getId());
+                    log.error(errorMsg);
+                    throw new BadRequestException(errorMsg);
+                }
+
+                final Question existingQuestion = existingSection.getQuestions().stream()
+                        .filter(ques -> ques.getId().equals(responseQuestion.getId()))
+                        .findFirst()
+                        .orElse(null);
+                validateOptionIds(existingQuestion, responseQuestion);
             }
-            final Question existingQuestion = existingSection.getQuestions().stream()
-                    .filter(ques -> ques.getId().equals(responseQuestion.getId()))
-                    .findFirst()
-                    .orElse(null);
-            validateOptions(formId, existingSection.getId(), existingQuestion, responseQuestion);
         }
     }
 
     /**
      * Helper method to validate option IDs in a question in the form
      *
-     * @param formId           ID of the form
-     * @param sectionId        ID of the section
      * @param existingQuestion existing question in a section of the form
      * @param responseQuestion question in the form response
      * @throws BadRequestException
      */
-    private static void validateOptions(final String formId, final String sectionId,
-                                        final Question existingQuestion,
-                                        final ResponseQuestion responseQuestion) throws BadRequestException {
+    private void validateOptionIds(final Question existingQuestion,
+                                   final ResponseQuestion responseQuestion) throws BadRequestException {
         final List<String> existingOptionIds = existingQuestion.getOptions().stream()
                 .map(Option::getId)
                 .toList();
         for (String responseOptionId : responseQuestion.getOptions()) {
             if (!existingOptionIds.contains(responseOptionId)) {
-                final String errorMsg = String.format("Option ID %s does not exist in question %s in" +
-                        " section %s within form %s", responseOptionId, responseQuestion.getId(), sectionId,
-                        formId);
+                final String errorMsg = String.format("Option ID %s does not exist", responseOptionId);
                 log.error(errorMsg);
                 throw new BadRequestException(errorMsg);
+            }
+        }
+    }
+
+    /**
+     * Helper method to check whether a required question is answered in the response
+     *
+     * @param form         form details
+     * @param formResponse form response to be saved
+     * @throws BadRequestException
+     */
+    private void checkRequiredQuestions(final Form form,
+                                        final FormResponseSaveRequest formResponse) throws BadRequestException {
+        for (Section existingSection : form.getSections()) {
+            final List<String> responseQuestionIds = Optional.ofNullable(formResponse.getSections())
+                    .orElse(Collections.emptyList()) // Handle null sections
+                    .stream()
+                    .filter(sec -> sec.getId().equals(existingSection.getId()))
+                    .findFirst()
+                    .map(ResponseSection::getQuestions)
+                    .orElse(Collections.emptyList()) // Handle null or empty questions
+                    .stream()
+                    .map(ResponseQuestion::getId)
+                    .toList();
+            for (Question existingQuestion : existingSection.getQuestions()) {
+                if (existingQuestion.isRequired() && !responseQuestionIds.contains(existingQuestion.getId())) {
+                    final String errorMsg = String.format("Question ID %s is required", existingQuestion.getId());
+                    log.error(errorMsg);
+                    throw new BadRequestException(errorMsg);
+                }
             }
         }
     }

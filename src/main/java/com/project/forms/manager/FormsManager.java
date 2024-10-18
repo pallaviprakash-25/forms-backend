@@ -7,7 +7,6 @@ import com.project.forms.dao.response.FormDetailsById;
 import com.project.forms.dao.response.FormDetailsByUserId;
 import com.project.forms.dao.response.PublishedFormDetailsById;
 import com.project.forms.repository.FormsRepository;
-import com.project.forms.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
@@ -109,21 +108,21 @@ public class FormsManager {
      *
      * @param request {@link FormCreateUpdateRequest} instance
      */
-    private static void setIds(final FormCreateUpdateRequest request) {
+    private void setIds(final FormCreateUpdateRequest request) {
         if (!CollectionUtils.isEmpty(request.getSections())) {
             request.getSections().forEach(section -> {
                 if (StringUtils.isBlank(section.getId())) {
-                    section.setId(Utils.generateRandomId());
+                    section.setId(UUID.randomUUID().toString());
                 }
                 if (!CollectionUtils.isEmpty(section.getQuestions())) {
                     section.getQuestions().forEach(question -> {
                         if (StringUtils.isBlank(question.getId())) {
-                            question.setId(Utils.generateRandomId());
+                            question.setId(UUID.randomUUID().toString());
                         }
                         if (!CollectionUtils.isEmpty(question.getOptions())) {
                             question.getOptions().forEach(option -> {
                                 if (StringUtils.isBlank(option.getId())) {
-                                    option.setId(Utils.generateRandomId());
+                                    option.setId(UUID.randomUUID().toString());
                                 }
                             });
                         }
