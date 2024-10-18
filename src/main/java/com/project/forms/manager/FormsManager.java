@@ -104,6 +104,20 @@ public class FormsManager {
     }
 
     /**
+     * Method to delete form by formId
+     *
+     * @param formId ID of the form
+     */
+    public void deleteFormById(final String formId) throws BadRequestException {
+        final Optional<Form> form = formsRepository.findById(formId);
+        if (form.isEmpty()) {
+            log.error("Form with ID {} does not exist", formId);
+            throw new BadRequestException("Form ID does not exist");
+        }
+        formsRepository.deleteById(formId);
+    }
+
+    /**
      * Helper method to set section, question and option IDs if missing
      *
      * @param request {@link FormCreateUpdateRequest} instance

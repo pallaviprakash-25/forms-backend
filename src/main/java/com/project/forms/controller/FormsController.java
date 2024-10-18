@@ -45,4 +45,10 @@ public class FormsController {
         final PublishedFormDetailsById response = formsService.getPublishedFormById(id);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping(value = ID)
+    public ResponseEntity<Void> deleteFormById(@PathVariable final String id) throws BadRequestException {
+        formsService.deleteFormById(id);
+        return ResponseEntity.ok().build();
+    }
 }
