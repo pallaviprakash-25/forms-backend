@@ -1,7 +1,8 @@
 package com.project.forms.dao.model;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -11,11 +12,12 @@ import java.util.List;
 public class Section {
     private String id;
 
-    @NotNull
+    @NotBlank
     @Size(max=256, message = "Section name can have a maximum of 256 characters")
     private String name;
 
     @Size(max=256, message = "Section description can have a maximum of 256 characters")
+    @Pattern(regexp = "^\\s*\\S.*$", message = "Section description must not be blank")  // Ensures the field is not blank if present
     private String description;
 
     private boolean shuffle;

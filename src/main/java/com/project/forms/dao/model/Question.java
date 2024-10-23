@@ -1,6 +1,7 @@
 package com.project.forms.dao.model;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,11 +13,11 @@ import java.util.List;
 public class Question {
     private String id;
 
-    @NotNull
+    @NotBlank
     @Size(max=256, message = "Question label can have a maximum of 256 characters")
     private String label;
 
-    @NotNull
+    @NotBlank
     @Pattern(regexp = "multi_select|single_select", message = "Question type must be multi_select or single_select")
     private String type;
 
