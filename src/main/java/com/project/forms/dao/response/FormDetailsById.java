@@ -12,13 +12,12 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FormResponseById {
-    private String formId;
+public class FormDetailsById {
     private String formName;
     private List<Section> sections;
 
-    public static FormResponseById from(final Form form) {
-        final FormResponseById response = new FormResponseById();
+    public static FormDetailsById from(final Form form) {
+        final FormDetailsById response = new FormDetailsById();
         BeanUtils.copyProperties(form, response);
         return response;
     }

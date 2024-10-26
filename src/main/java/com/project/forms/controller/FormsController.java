@@ -2,9 +2,9 @@ package com.project.forms.controller;
 
 import com.project.forms.dao.request.FormCreateUpdateRequest;
 import com.project.forms.dao.response.FormCreateUpdateResponse;
-import com.project.forms.dao.response.FormResponseById;
-import com.project.forms.dao.response.FormResponseByUserId;
-import com.project.forms.dao.response.PublishedFormResponseById;
+import com.project.forms.dao.response.FormDetailsById;
+import com.project.forms.dao.response.FormDetailsByUserId;
+import com.project.forms.dao.response.PublishedFormDetailsById;
 import com.project.forms.manager.FormsManager;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
@@ -29,20 +29,26 @@ public class FormsController {
     }
 
     @GetMapping(value = ID, produces = "application/json")
-    public ResponseEntity<FormResponseById> fetchFormByFormId(@PathVariable final String id) throws BadRequestException {
-        final FormResponseById response = formsService.getFormByFormId(id);
+    public ResponseEntity<FormDetailsById> fetchFormByFormId(@PathVariable final String id) throws BadRequestException {
+        final FormDetailsById response = formsService.getFormByFormId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = USER_ID_PATH, produces = "application/json")
-    public ResponseEntity<FormResponseByUserId> fetchFormByUserId(@PathVariable final String id) {
-        final FormResponseByUserId response = formsService.getFormByUserId(id);
+    public ResponseEntity<FormDetailsByUserId> fetchFormByUserId(@PathVariable final String id) {
+        final FormDetailsByUserId response = formsService.getFormByUserId(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = PUBLISHED_FORM_BY_ID_PATH, produces = "application/json")
-    public ResponseEntity<PublishedFormResponseById> fetchPublishedFormById(@PathVariable final String id) throws BadRequestException {
-        final PublishedFormResponseById response = formsService.getPublishedFormById(id);
+    public ResponseEntity<PublishedFormDetailsById> fetchPublishedFormById(@PathVariable final String id) throws BadRequestException {
+        final PublishedFormDetailsById response = formsService.getPublishedFormById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(value = ID)
+    public ResponseEntity<Void> deleteFormById(@PathVariable final String id) throws BadRequestException {
+        formsService.deleteFormById(id);
+        return ResponseEntity.ok().build();
     }
 }

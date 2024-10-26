@@ -3,11 +3,10 @@ package com.project.forms.manager;
 import com.project.forms.dao.model.Form;
 import com.project.forms.dao.request.FormCreateUpdateRequest;
 import com.project.forms.dao.response.FormCreateUpdateResponse;
-import com.project.forms.dao.response.FormResponseById;
-import com.project.forms.dao.response.FormResponseByUserId;
-import com.project.forms.dao.response.PublishedFormResponseById;
+import com.project.forms.dao.response.FormDetailsById;
+import com.project.forms.dao.response.FormDetailsByUserId;
+import com.project.forms.dao.response.PublishedFormDetailsById;
 import com.project.forms.repository.FormsRepository;
-import com.project.forms.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
@@ -65,43 +64,57 @@ public class FormsManager {
      * Method to fetch form details based on formId
      *
      * @param formId ID of the form
-     * @return {@link FormResponseById} instance
+     * @return {@link FormDetailsById} instance
      * @throws BadRequestException
      */
-    public FormResponseById getFormByFormId(final String formId) throws BadRequestException {
+    public FormDetailsById getFormByFormId(final String formId) throws BadRequestException {
         final Optional<Form> form = formsRepository.findById(formId);
         if (form.isEmpty()) {
             log.error("Form with ID {} does not exist", formId);
             throw new BadRequestException("Form ID does not exist");
         }
-        return FormResponseById.from(form.get());
+        return FormDetailsById.from(form.get());
     }
 
     /**
      * Method to fetch details of all forms created by a user
      *
      * @param userId ID of the user whose forms need to be fetched
-     * @return {@link FormResponseByUserId} instance
+     * @return {@link FormDetailsByUserId} instance
      */
-    public FormResponseByUserId getFormByUserId(final String userId) {
+    public FormDetailsByUserId getFormByUserId(final String userId) {
         final List<Form> forms = formsRepository.findAllByUserId(userId);
-        return FormResponseByUserId.from(forms);
+        return FormDetailsByUserId.from(forms);
     }
 
     /**
      * Method to fetch published form details based on formId
      *
      * @param formId ID of the form
-     * @return {@link PublishedFormResponseById} instance
+     * @return {@link PublishedFormDetailsById} instance
      * @throws BadRequestException
      */
-    public PublishedFormResponseById getPublishedFormById(final String formId) throws BadRequestException {
+    public PublishedFormDetailsById getPublishedFormById(final String formId) throws BadRequestException {
         final Optional<Form> form = formsRepository.findById(formId);
         if (form.isEmpty()) {
             log.error("Form with ID {} does not exist", formId);
             throw new BadRequestException("Form ID does not exist");
         }
-        return PublishedFormResponseById.from(form.get());
+        return PublishedFormDetailsById.from(form.get());
+    }
+
+    /**
+     * Method to delete form by formId
+     *
+     * @param formId ID of the form
+     */
+    public void deleteFormById(final String formId) throws BadRequestException {
+        final Optional<Form> form = formsRepository.findById(formId);
+        if (form.isEmpty()) {
+            log.error("Form with ID {} does not exist", formId);
+            throw new BadRequestException("Form ID does not exist");
+        }
+        formsRepository.deleteById(formId);
     }
 
     /**
@@ -109,21 +122,21 @@ public class FormsManager {
      *
      * @param request {@link FormCreateUpdateRequest} instance
      */
-    private static void setIds(final FormCreateUpdateRequest request) {
+    private void setIds(final FormCreateUpdateRequest request) {
         if (!CollectionUtils.isEmpty(request.getSections())) {
             request.getSections().forEach(section -> {
                 if (StringUtils.isBlank(section.getId())) {
-                    section.setId(Utils.generateRandomId());
+                    section.setId(UUID.randomUUID().toString());
                 }
                 if (!CollectionUtils.isEmpty(section.getQuestions())) {
                     section.getQuestions().forEach(question -> {
                         if (StringUtils.isBlank(question.getId())) {
-                            question.setId(Utils.generateRandomId());
+                            question.setId(UUID.randomUUID().toString());
                         }
                         if (!CollectionUtils.isEmpty(question.getOptions())) {
                             question.getOptions().forEach(option -> {
                                 if (StringUtils.isBlank(option.getId())) {
-                                    option.setId(Utils.generateRandomId());
+                                    option.setId(UUID.randomUUID().toString());
                                 }
                             });
                         }

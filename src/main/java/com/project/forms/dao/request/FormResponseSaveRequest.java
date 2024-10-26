@@ -2,10 +2,9 @@ package com.project.forms.dao.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.project.forms.dao.model.Audit;
-import com.project.forms.dao.model.Section;
+import com.project.forms.dao.model.ResponseSection;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -14,16 +13,13 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FormCreateUpdateRequest {
+public class FormResponseSaveRequest {
+    @NotNull
     private String formId;
 
-    @NotBlank
-    @Size(max=256, message = "Form name can have a maximum of 256 characters")
-    private String formName;
+    private String submittedBy;
 
     @Valid
     @Size(max=30, message = "A form can have a maximum of 30 sections")
-    private List<Section> sections;
-
-    private Audit audit;
+    private List<ResponseSection> sections;
 }

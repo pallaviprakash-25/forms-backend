@@ -12,19 +12,17 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PublishedFormResponseById {
-    private String formId;
+public class PublishedFormDetailsById {
     private List<PublishedSection> sections;
 
-    public static PublishedFormResponseById from(final Form form) {
-        final PublishedFormResponseById publishedFormResponse = new PublishedFormResponseById();
-        publishedFormResponse.setFormId(form.getFormId());
+    public static PublishedFormDetailsById from(final Form form) {
+        final PublishedFormDetailsById publishedFormDetails = new PublishedFormDetailsById();
         if (!CollectionUtils.isEmpty(form.getSections())) {
             final List<PublishedSection> publishedSections = form.getSections().stream()
                     .map(PublishedSection::from)
                     .toList();
-            publishedFormResponse.setSections(publishedSections);
+            publishedFormDetails.setSections(publishedSections);
         }
-        return publishedFormResponse;
+        return publishedFormDetails;
     }
 }
