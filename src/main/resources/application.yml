@@ -1,0 +1,18 @@
+spring:
+    config:
+        import: "classpath:secrets.yml"
+    application:
+        name: forms
+    data:
+        mongodb:
+            database: ${spring.mongo.database}
+            uri: ${spring.mongo.uri}
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        client-id: ${spring.security.google.client-id}
+                        client-secret: ${spring.security.google.client-secret}
+
+logging.level.org.springframework.security: TRACE

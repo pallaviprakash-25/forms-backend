@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -34,15 +35,15 @@ public class FormsManager {
      * @param request {@link FormCreateUpdateRequest} instance
      * @return {@link FormCreateUpdateResponse} instance
      */
-    public FormCreateUpdateResponse createUpdateForm(final FormCreateUpdateRequest request) throws BadRequestException {
+    public FormCreateUpdateResponse createUpdateForm(final FormCreateUpdateRequest request,
+                                                     final OAuth2User user) throws BadRequestException {
         final Date currentDate = Date.from(Instant.now());
         if (StringUtils.isAllEmpty(request.getFormId())) {
             // create request
             final String formId = UUID.randomUUID().toString();
             request.setFormId(formId);
             request.getAudit().setCreatedOn(currentDate);
-            request.getAudit().setModifiedOn(currentDate);
-
+            request.getAudit().setCreatedBy(user.getAttributes().get("name").toString());
         } else {
             // update request
             final Optional<Form> form = formsRepository.findById(request.getFormId());
@@ -51,6 +52,7 @@ public class FormsManager {
                 throw new BadRequestException("Form ID does not exist");
             }
             request.getAudit().setModifiedOn(currentDate);
+            request.getAudit().setModifiedBy(user.getAttributes().get("name").toString());
         }
         setIds(request);
 

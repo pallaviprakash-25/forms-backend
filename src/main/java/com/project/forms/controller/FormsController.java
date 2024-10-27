@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +25,9 @@ public class FormsController {
     private FormsManager formsService;
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<FormCreateUpdateResponse> createOrUpdateForm(@Valid @RequestBody final FormCreateUpdateRequest request) throws BadRequestException {
-        final FormCreateUpdateResponse response = formsService.createUpdateForm(request);
+    public ResponseEntity<FormCreateUpdateResponse> createOrUpdateForm(@Valid @RequestBody final FormCreateUpdateRequest request,
+                                                                       @AuthenticationPrincipal OAuth2User user) throws BadRequestException {
+        final FormCreateUpdateResponse response = formsService.createUpdateForm(request, user);
         return ResponseEntity.ok(response);
     }
 
