@@ -2,6 +2,7 @@
 FROM maven:3.8.5-openjdk-17 AS build
 
 ARG MONGO_URI
+ARG FRONTEND_BASE_URI
 
 WORKDIR /app
 COPY pom.xml .
