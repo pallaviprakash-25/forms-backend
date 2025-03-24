@@ -1,4 +1,4 @@
-package com.project.forms.security;
+package com.project.forms.config;
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +19,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(frontEndUrl)
-                        .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(),
-                                HttpMethod.PUT.name(), HttpMethod.DELETE.name())
+                        .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.DELETE.name())
                         .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.AUTHORIZATION);
             }
         };

@@ -26,4 +26,10 @@ public interface Constants {
     String OPTIONS = "options";
     String LABEL = "label";
 
+    String SUB = "sub";
+    String NAME = "name";
+    String EMAIL = "email";
+    String PROFILE = "profile";
+    String OPENID = "openid";
+    String CODE = "code";
 }

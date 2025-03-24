@@ -3,6 +3,9 @@ FROM maven:3.8.5-openjdk-17 AS build
 
 ARG MONGO_URI
 ARG FRONTEND_BASE_URI
+ARG INTROSPECTION_URI
+ARG CLIENT_ID
+ARG CLIENT_SECRET
 
 WORKDIR /app
 COPY pom.xml .
@@ -18,4 +21,4 @@ COPY --from=build /app/target/forms-*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "java -jar app.jar --spring.data.mongodb.uri=$MONGO_URI"]
+ENTRYPOINT ["sh", "-c", "java -jar app.jar"]
