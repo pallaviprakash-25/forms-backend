@@ -29,7 +29,10 @@ public interface Constants {
     String SUB = "sub";
     String NAME = "name";
     String EMAIL = "email";
+    String PICTURE = "picture";
     String PROFILE = "profile";
     String OPENID = "openid";
     String CODE = "code";
+
+    String MOCK_USER = "mockUser";
 }

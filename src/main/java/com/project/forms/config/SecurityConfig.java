@@ -12,8 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static com.project.forms.utils.APIConstants.AUTH;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,9 +29,10 @@ public class SecurityConfig {
                 .exceptionHandling(customizer -> customizer.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AUTH + "/**").permitAll()
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(c -> c.opaqueToken(Customizer.withDefaults()));
+                .oauth2ResourceServer(c -> c.opaqueToken(Customizer.withDefaults()))
+                .csrf().disable();
         return httpSecurity.build();
     }
 

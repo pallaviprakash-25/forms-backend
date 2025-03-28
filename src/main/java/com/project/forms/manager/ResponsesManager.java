@@ -15,6 +15,8 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.*;
 
+import static com.project.forms.utils.Constants.MOCK_USER;
+
 @Service
 @Slf4j
 public class ResponsesManager {
@@ -31,14 +33,19 @@ public class ResponsesManager {
      * @param request {@link FormResponseSaveRequest} instance
      * @throws BadRequestException
      */
-    public void saveFormResponse(final FormResponseSaveRequest request) throws BadRequestException {
-        final Optional<Form> form = formsRepository.findById(request.getFormId());
+    public void saveFormResponse(final FormResponseSaveRequest request, final String userId) throws BadRequestException {
+        List<Form> form;
+        if (userId.equals(MOCK_USER)) {
+            form = formsRepository.findFormByFormAndUserId(request.getFormId(), userId);
+        } else {
+            form = formsRepository.findById(request.getFormId()).stream().toList();
+        }
         if (form.isEmpty()) {
             log.error("Form with ID {} does not exist", request.getFormId());
             throw new BadRequestException("Form ID does not exist");
         }
 
-        validateSectionIds(form.get(), request);
+        validateSectionIds(form.get(0), request);
 
         final Response response = new Response();
         BeanUtils.copyProperties(request, response);
@@ -59,8 +66,8 @@ public class ResponsesManager {
      * @return {@link ResponsesByFormId} instance containing list of responses
      * @throws BadRequestException
      */
-    public ResponsesByFormId getAllResponses(final String formId) throws BadRequestException {
-        final Optional<Form> form = formsRepository.findById(formId);
+    public ResponsesByFormId getAllResponses(final String formId, final String userId) throws BadRequestException {
+        final List<Form> form = formsRepository.findFormByFormAndUserId(formId, userId);
         if (form.isEmpty()) {
             log.error("Form with ID {} does not exist", formId);
             throw new BadRequestException("Form ID does not exist");
