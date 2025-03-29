@@ -17,10 +17,10 @@ public class UserController {
     @GetMapping(USER)
     public ResponseEntity<UserDetails> getUserInfo(@AuthenticationPrincipal final OAuth2User user) {
         String userId, name, email, pictureUrl;
-        if (getUserId(user).equals(MOCK_USER)) {
-            userId = MOCK_USER;
-            name = MOCK_USER;
-            email = MOCK_USER;
+        if (getUserId(user).equals(GUEST_USER)) {
+            userId = GUEST_USER;
+            name = GUEST_USER;
+            email = GUEST_USER;
             pictureUrl = "#";
         } else {
             userId = user.getAttributes().get(SUB).toString();

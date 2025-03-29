@@ -34,5 +34,5 @@ public interface Constants {
     String OPENID = "openid";
     String CODE = "code";
 
-    String MOCK_USER = "mockUser";
+    String GUEST_USER = "guest";
 }

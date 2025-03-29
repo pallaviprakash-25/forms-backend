@@ -5,6 +5,7 @@ import com.project.forms.dao.request.FormResponseSaveRequest;
 import com.project.forms.dao.response.ResponsesByFormId;
 import com.project.forms.repository.FormsRepository;
 import com.project.forms.repository.ResponsesRepository;
+import com.project.forms.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.BeanUtils;
@@ -15,7 +16,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.*;
 
-import static com.project.forms.utils.Constants.MOCK_USER;
+import static com.project.forms.utils.Constants.GUEST_USER;
 
 @Service
 @Slf4j
@@ -35,15 +36,12 @@ public class ResponsesManager {
      */
     public void saveFormResponse(final FormResponseSaveRequest request, final String userId) throws BadRequestException {
         List<Form> form;
-        if (userId.equals(MOCK_USER)) {
+        if (userId.equals(GUEST_USER)) {
             form = formsRepository.findFormByFormAndUserId(request.getFormId(), userId);
         } else {
             form = formsRepository.findById(request.getFormId()).stream().toList();
         }
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", request.getFormId());
-            throw new BadRequestException("Form ID does not exist");
-        }
+        CommonUtils.validateFormResponse(form, request.getFormId());
 
         validateSectionIds(form.get(0), request);
 
@@ -55,6 +53,7 @@ public class ResponsesManager {
 
         final Date currentDate = Date.from(Instant.now());
         response.setSubmittedOn(currentDate);
+        response.setSubmittedBy(userId);
 
         responsesRepository.save(response);
     }
@@ -68,10 +67,7 @@ public class ResponsesManager {
      */
     public ResponsesByFormId getAllResponses(final String formId, final String userId) throws BadRequestException {
         final List<Form> form = formsRepository.findFormByFormAndUserId(formId, userId);
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", formId);
-            throw new BadRequestException("Form ID does not exist");
-        }
+        CommonUtils.validateFormResponse(form, formId);
         final List<Response> responses = responsesRepository.findAllByFormId(formId);
         return new ResponsesByFormId(responses);
     }

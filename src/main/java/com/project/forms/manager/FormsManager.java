@@ -8,6 +8,7 @@ import com.project.forms.dao.response.FormDetailsById;
 import com.project.forms.dao.response.FormDetailsByUserId;
 import com.project.forms.dao.response.PublishedFormDetailsById;
 import com.project.forms.repository.FormsRepository;
+import com.project.forms.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.BadRequestException;
@@ -21,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.project.forms.utils.Constants.MOCK_USER;
+import static com.project.forms.utils.Constants.GUEST_USER;
 
 @Service
 @Slf4j
@@ -43,15 +44,14 @@ public class FormsManager {
             // create request
             final String formId = UUID.randomUUID().toString();
             request.setFormId(formId);
-            final Audit audit = new Audit(userId, currentDate, userId, currentDate);
+            final Audit audit = new Audit();
+            audit.setCreatedOn(currentDate);
+            audit.setCreatedBy(userId);
             request.setAudit(audit);
         } else {
             // update request
             final List<Form> form = formsRepository.findFormByFormAndUserId(request.getFormId(), userId);
-            if (form.isEmpty()) {
-                log.error("Form with ID {} does not exist", request.getFormId());
-                throw new BadRequestException("Form ID does not exist");
-            }
+            CommonUtils.validateFormResponse(form, request.getFormId());
             request.getAudit().setModifiedOn(currentDate);
             request.getAudit().setModifiedBy(userId);
         }
@@ -72,10 +72,7 @@ public class FormsManager {
      */
     public FormDetailsById getFormByFormAndUserId(final String formId, final String userId) throws BadRequestException {
         final List<Form> form = formsRepository.findFormByFormAndUserId(formId, userId);
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", formId);
-            throw new BadRequestException("Form ID does not exist");
-        }
+        CommonUtils.validateFormResponse(form, formId);
         return FormDetailsById.from(form.get(0));
     }
 
@@ -99,15 +96,12 @@ public class FormsManager {
      */
     public PublishedFormDetailsById getPublishedFormById(final String formId, final String userId) throws BadRequestException {
         List<Form> form;
-        if (userId.equals(MOCK_USER)) {
+        if (userId.equals(GUEST_USER)) {
             form =  formsRepository.findFormByFormAndUserId(formId, userId);
         } else {
             form = formsRepository.findById(formId).stream().toList();
         }
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", formId);
-            throw new BadRequestException("Form ID does not exist");
-        }
+        CommonUtils.validateFormResponse(form, formId);
         return PublishedFormDetailsById.from(form.get(0));
     }
 
@@ -118,10 +112,7 @@ public class FormsManager {
      */
     public void deleteFormById(final String formId, final String userId) throws BadRequestException {
         final List<Form> form = formsRepository.findFormByFormAndUserId(formId, userId);
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", formId);
-            throw new BadRequestException("Form ID does not exist");
-        }
+        CommonUtils.validateFormResponse(form, formId);
         formsRepository.deleteById(formId);
     }
 
