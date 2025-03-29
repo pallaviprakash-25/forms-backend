@@ -12,7 +12,6 @@ public interface APIConstants {
     String CALLBACK = "/callback";
 
     String FORMS_PATH = API_VERSION_1 + FORMS;
-    String USER_ID_PATH = USER + ID;
     String PUBLISHED_FORM_BY_ID_PATH = PUBLISHED + ID;
 
     String FORM_RESPONSE_PATH = FORMS_PATH + RESPONSE;

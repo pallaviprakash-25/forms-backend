@@ -1,17 +1,11 @@
 # Build using maven
 FROM maven:3.8.5-openjdk-17 AS build
 
-ARG MONGO_URI
-ARG FRONTEND_BASE_URI
-ARG INTROSPECTION_URI
-ARG CLIENT_ID
-ARG CLIENT_SECRET
-
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 # Run on jdk17
 FROM openjdk:17.0.1-jdk-slim

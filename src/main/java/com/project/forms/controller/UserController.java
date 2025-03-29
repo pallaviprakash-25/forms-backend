@@ -1,6 +1,8 @@
 package com.project.forms.controller;
 
 import com.project.forms.dao.response.UserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -12,8 +14,10 @@ import static com.project.forms.utils.CommonUtils.getUserId;
 import static com.project.forms.utils.Constants.*;
 
 @RestController
+@Tag(name = "User", description = "User Details API")
 public class UserController {
 
+    @Operation(summary = "Get current user details", description = "Get current user details")
     @GetMapping(USER)
     public ResponseEntity<UserDetails> getUserInfo(@AuthenticationPrincipal final OAuth2User user) {
         String userId, name, email, pictureUrl;
@@ -21,7 +25,7 @@ public class UserController {
             userId = GUEST_USER;
             name = GUEST_USER;
             email = GUEST_USER;
-            pictureUrl = "#";
+            pictureUrl = "test";
         } else {
             userId = user.getAttributes().get(SUB).toString();
             name = user.getAttributes().get(NAME).toString();
