@@ -11,4 +11,4 @@ target/
 *.ipr
 
 ### Secrets ###
-/src/main/resources/secrets.yml
+/src/main/resources/secrets.env
