@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.project.forms.utils.Constants.GUEST_USER;
+import static com.project.forms.utils.Constants.ROLE_GUEST;
 
 @Service
 @Slf4j
@@ -94,9 +94,10 @@ public class FormsManager {
      * @return {@link PublishedFormDetailsById} instance
      * @throws BadRequestException
      */
-    public PublishedFormDetailsById getPublishedFormById(final String formId, final String userId) throws BadRequestException {
+    public PublishedFormDetailsById getPublishedFormById(final String formId, final String userId,
+                                                         final String role) throws BadRequestException {
         List<Form> form;
-        if (userId.equals(GUEST_USER)) {
+        if (role.equals(ROLE_GUEST)) {
             form =  formsRepository.findFormByFormAndUserId(formId, userId);
         } else {
             form = formsRepository.findById(formId).stream().toList();

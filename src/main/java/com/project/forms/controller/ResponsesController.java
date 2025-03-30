@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import static com.project.forms.utils.APIConstants.FORM_RESPONSE_PATH;
 import static com.project.forms.utils.APIConstants.ID;
+import static com.project.forms.utils.CommonUtils.getRole;
 import static com.project.forms.utils.CommonUtils.getUserId;
 
 @RestController
@@ -29,16 +30,16 @@ public class ResponsesController {
     @Operation(summary = "Save form response", description = "Saves form response")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveFormResponse(@Valid @RequestBody final FormResponseSaveRequest request,
-                                                 @AuthenticationPrincipal final OAuth2User user) throws BadRequestException {
-        responsesManager.saveFormResponse(request, getUserId(user));
+                                                 @AuthenticationPrincipal final Jwt token) throws BadRequestException {
+        responsesManager.saveFormResponse(request, getUserId(token), getRole(token));
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Get all form responses", description = "Gets all form responses, if form was created by current user")
     @GetMapping(value = ID, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponsesByFormId> getAllResponses(@PathVariable final String id,
-                                                             @AuthenticationPrincipal final OAuth2User user) throws BadRequestException {
-        final ResponsesByFormId response = responsesManager.getAllResponses(id, getUserId(user));
+                                                             @AuthenticationPrincipal final Jwt token) throws BadRequestException {
+        final ResponsesByFormId response = responsesManager.getAllResponses(id, getRole(token));
         return ResponseEntity.ok(response);
     }
 }

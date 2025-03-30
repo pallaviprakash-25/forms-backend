@@ -10,6 +10,7 @@ public interface APIConstants {
     String AUTH = "/auth";
     String URL = "/url";
     String CALLBACK = "/callback";
+    String GUEST_TOKEN = "/guest-token";
 
     String FORMS_PATH = API_VERSION_1 + FORMS;
     String PUBLISHED_FORM_BY_ID_PATH = PUBLISHED + ID;
@@ -18,6 +19,7 @@ public interface APIConstants {
 
     String AUTH_URL = AUTH + URL;
     String AUTH_CALLBACK_URL = AUTH + CALLBACK;
+    String AUTH_GUEST_TOKEN_URL = AUTH + GUEST_TOKEN;
 
-    String OAUTH2_USERINFO_PATH = "/oauth2/v3/userinfo";
+    String GOOGLE_TOKEN_ISSUER = "https://accounts.google.com";
 }

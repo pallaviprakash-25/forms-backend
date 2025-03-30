@@ -16,7 +16,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.*;
 
-import static com.project.forms.utils.Constants.GUEST_USER;
+import static com.project.forms.utils.Constants.ROLE_GUEST;
 
 @Service
 @Slf4j
@@ -34,9 +34,10 @@ public class ResponsesManager {
      * @param request {@link FormResponseSaveRequest} instance
      * @throws BadRequestException
      */
-    public void saveFormResponse(final FormResponseSaveRequest request, final String userId) throws BadRequestException {
+    public void saveFormResponse(final FormResponseSaveRequest request, final String userId,
+                                 final String role) throws BadRequestException {
         List<Form> form;
-        if (userId.equals(GUEST_USER)) {
+        if (role.equals(ROLE_GUEST)) {
             form = formsRepository.findFormByFormAndUserId(request.getFormId(), userId);
         } else {
             form = formsRepository.findById(request.getFormId()).stream().toList();
