@@ -12,3 +12,4 @@ target/
 
 ### Secrets ###
 /src/main/resources/secrets.env
+/src/main/resources/secrets.yml
