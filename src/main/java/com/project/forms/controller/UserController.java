@@ -20,19 +20,19 @@ public class UserController {
     @Operation(summary = "Get current user details", description = "Get current user details")
     @GetMapping(USER)
     public ResponseEntity<UserDetails> getUserInfo(@AuthenticationPrincipal final Jwt token) {
-        String userId, name, email, picture;
+        String id, name, email, picture;
         if (getRole(token).equals(ROLE_GUEST)) {
-            userId = GUEST;
+            id = GUEST;
             name = GUEST;
             email = GUEST;
             picture = "#";
         } else {
-            userId = token.getSubject();
+            id = token.getSubject();
             name = token.getClaim(NAME);
             email = token.getClaim(EMAIL);
             picture = token.getClaim(PICTURE);
         }
-        UserDetails userDetails = new UserDetails(userId, name, email, picture);
+        UserDetails userDetails = new UserDetails(id, name, email, picture);
         return ResponseEntity.ok(userDetails);
     }
 }
