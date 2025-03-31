@@ -11,5 +11,11 @@ import java.util.List;
 public interface FormsRepository extends MongoRepository<Form, String> {
 
     @Query("{ 'audit.createdBy' : ?0 }")
-    List<Form> findAllByUserId(final String userId);
+    List<Form> findAllFormsByUserId(final String userId);
+
+    @Query("{ 'formId': ?0, 'audit.createdBy': ?1 }")
+    List<Form> findFormByFormAndUserId(final String formId, final String userId);
+
+    @Query("{ 'formId': ?0, 'audit.createdBy': { $ne: ?1 } }")
+    List<Form> findFormByFormIdNotCreatedByUserId(final String formId, final String userId);
 }

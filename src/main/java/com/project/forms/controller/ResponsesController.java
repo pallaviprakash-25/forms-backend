@@ -3,32 +3,43 @@ package com.project.forms.controller;
 import com.project.forms.dao.request.FormResponseSaveRequest;
 import com.project.forms.dao.response.ResponsesByFormId;
 import com.project.forms.manager.ResponsesManager;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import static com.project.forms.utils.APIConstants.FORM_RESPONSE_PATH;
 import static com.project.forms.utils.APIConstants.ID;
+import static com.project.forms.utils.CommonUtils.getRole;
+import static com.project.forms.utils.CommonUtils.getUserId;
 
-@Controller
+@RestController
 @RequestMapping(value = FORM_RESPONSE_PATH)
+@Tag(name = "Response", description = "Response Management APIs")
 public class ResponsesController {
 
     @Autowired
     private ResponsesManager responsesManager;
 
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<Void> saveFormResponse(@Valid @RequestBody final FormResponseSaveRequest request) throws BadRequestException {
-        responsesManager.saveFormResponse(request);
+    @Operation(summary = "Save form response", description = "Saves form response")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> saveFormResponse(@Valid @RequestBody final FormResponseSaveRequest request,
+                                                 @AuthenticationPrincipal final Jwt token) throws BadRequestException {
+        responsesManager.saveFormResponse(request, getUserId(token), getRole(token));
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = ID, produces = "application/json")
-    public ResponseEntity<ResponsesByFormId> getAllResponses(@PathVariable final String id) throws BadRequestException {
-        final ResponsesByFormId response = responsesManager.getAllResponses(id);
+    @Operation(summary = "Get all form responses", description = "Gets all form responses, if form was created by current user")
+    @GetMapping(value = ID, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponsesByFormId> getAllResponses(@PathVariable final String id,
+                                                             @AuthenticationPrincipal final Jwt token) throws BadRequestException {
+        final ResponsesByFormId response = responsesManager.getAllResponses(id, getRole(token));
         return ResponseEntity.ok(response);
     }
 }

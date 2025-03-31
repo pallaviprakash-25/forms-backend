@@ -5,6 +5,7 @@ import com.project.forms.dao.request.FormResponseSaveRequest;
 import com.project.forms.dao.response.ResponsesByFormId;
 import com.project.forms.repository.FormsRepository;
 import com.project.forms.repository.ResponsesRepository;
+import com.project.forms.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.BeanUtils;
@@ -14,6 +15,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.util.*;
+
+import static com.project.forms.utils.Constants.GUEST;
+import static com.project.forms.utils.Constants.ROLE_GUEST;
 
 @Service
 @Slf4j
@@ -31,14 +35,19 @@ public class ResponsesManager {
      * @param request {@link FormResponseSaveRequest} instance
      * @throws BadRequestException
      */
-    public void saveFormResponse(final FormResponseSaveRequest request) throws BadRequestException {
-        final Optional<Form> form = formsRepository.findById(request.getFormId());
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", request.getFormId());
-            throw new BadRequestException("Form ID does not exist");
+    public void saveFormResponse(final FormResponseSaveRequest request, final String userId,
+                                 final String role) throws BadRequestException {
+        List<Form> form;
+        if (role.equals(ROLE_GUEST)) {
+            // guest users can only respond to forms created by them
+            form = formsRepository.findFormByFormAndUserId(request.getFormId(), userId);
+        } else {
+            // Google-authenticated users can respond to forms created by other Google-authenticated users
+            form = formsRepository.findFormByFormIdNotCreatedByUserId(request.getFormId(), GUEST).stream().toList();
         }
+        CommonUtils.validateFormResponse(form, request.getFormId());
 
-        validateSectionIds(form.get(), request);
+        validateSectionIds(form.get(0), request);
 
         final Response response = new Response();
         BeanUtils.copyProperties(request, response);
@@ -48,6 +57,7 @@ public class ResponsesManager {
 
         final Date currentDate = Date.from(Instant.now());
         response.setSubmittedOn(currentDate);
+        response.setSubmittedBy(userId);
 
         responsesRepository.save(response);
     }
@@ -59,12 +69,9 @@ public class ResponsesManager {
      * @return {@link ResponsesByFormId} instance containing list of responses
      * @throws BadRequestException
      */
-    public ResponsesByFormId getAllResponses(final String formId) throws BadRequestException {
-        final Optional<Form> form = formsRepository.findById(formId);
-        if (form.isEmpty()) {
-            log.error("Form with ID {} does not exist", formId);
-            throw new BadRequestException("Form ID does not exist");
-        }
+    public ResponsesByFormId getAllResponses(final String formId, final String userId) throws BadRequestException {
+        final List<Form> form = formsRepository.findFormByFormAndUserId(formId, userId);
+        CommonUtils.validateFormResponse(form, formId);
         final List<Response> responses = responsesRepository.findAllByFormId(formId);
         return new ResponsesByFormId(responses);
     }
