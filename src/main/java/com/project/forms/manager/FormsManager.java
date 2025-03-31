@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.project.forms.utils.Constants.GUEST;
 import static com.project.forms.utils.Constants.ROLE_GUEST;
 
 @Service
@@ -98,9 +99,11 @@ public class FormsManager {
                                                          final String role) throws BadRequestException {
         List<Form> form;
         if (role.equals(ROLE_GUEST)) {
+            // guest users can only fetch forms published by them
             form =  formsRepository.findFormByFormAndUserId(formId, userId);
         } else {
-            form = formsRepository.findById(formId).stream().toList();
+            // Google-authenticated users can fetch forms published by other Google-authenticated users
+            form = formsRepository.findFormByFormIdNotCreatedByUserId(formId, GUEST).stream().toList();
         }
         CommonUtils.validateFormResponse(form, formId);
         return PublishedFormDetailsById.from(form.get(0));

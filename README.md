@@ -3,7 +3,9 @@ This is the backend service for Google Forms clone, built using Spring Boot and 
 
 ## Frontend Repo
 Link: https://github.com/xutkarshjain/Google-form
+
 Credits: [Utkarsh Jain](https://github.com/xutkarshjain)
+
 
 ## Features
 
@@ -18,12 +20,12 @@ Credits: [Utkarsh Jain](https://github.com/xutkarshjain)
 
 ### User Authorization
 #### Users Logged-in via Google
-- Have role set ROLE_USER
+- Assigned ROLE_USER role.
 - Can create, update, delete and view responses of forms created by self.
-- Can respond to forms created by any.
+- Can respond to forms created by any authenticated user.
 
 #### Guest Users
-- Have role set ROLE_GUEST
+- Assigned ROLE_GUEST role.
 - All guest users share the same data scope, meaning forms and responses created by one guest user are accessible to all guest users.
 - Cannot access or respond to forms created by authenticated users.
 

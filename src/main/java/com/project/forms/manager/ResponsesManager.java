@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.*;
 
+import static com.project.forms.utils.Constants.GUEST;
 import static com.project.forms.utils.Constants.ROLE_GUEST;
 
 @Service
@@ -38,9 +39,11 @@ public class ResponsesManager {
                                  final String role) throws BadRequestException {
         List<Form> form;
         if (role.equals(ROLE_GUEST)) {
+            // guest users can only respond to forms created by them
             form = formsRepository.findFormByFormAndUserId(request.getFormId(), userId);
         } else {
-            form = formsRepository.findById(request.getFormId()).stream().toList();
+            // Google-authenticated users can respond to forms created by other Google-authenticated users
+            form = formsRepository.findFormByFormIdNotCreatedByUserId(request.getFormId(), GUEST).stream().toList();
         }
         CommonUtils.validateFormResponse(form, request.getFormId());
 
